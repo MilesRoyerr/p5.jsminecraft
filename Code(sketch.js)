@@ -1,0 +1,69 @@
+
+let world = [];
+let worldSize = 10;
+let blockSize = 50;
+let playerX = 0, playerZ = 0;
+
+function setup() {
+  createCanvas(600, 400, WEBGL);
+
+  let noiseScale = 0.1;
+  for (let x = 0; x < worldSize; x++) {
+    world[x] = [];
+    for (let z = 0; z < worldSize; z++) {
+      let y = noise(x * noiseScale, z * noiseScale) * 100;
+      let type = random(["grass", "stone", "water"]);
+      world[x][z] = new Block(x * blockSize, y - 100, z * blockSize, blockSize, type);
+    }
+  }
+}
+
+function draw() {
+  background(135, 206, 235);
+  orbitControl();
+  translate(-worldSize * blockSize / 2, 0, -worldSize * blockSize / 2);
+
+  for (let x = 0; x < worldSize; x++) {
+    for (let z = 0; z < worldSize; z++) {
+      world[x][z].display();
+    }
+  }
+
+  let moveSpeed = 2;
+  if (keyIsDown(87)) playerZ -= moveSpeed;
+  if (keyIsDown(83)) playerZ += moveSpeed;
+  if (keyIsDown(65)) playerX -= moveSpeed;
+  if (keyIsDown(68)) playerX += moveSpeed;
+
+  push();
+  fill(255, 0, 0);
+  translate(playerX, -blockSize / 2, playerZ);
+  box(blockSize * 0.5);
+  pop();
+}
+
+class Block {
+  constructor(x, y, z, size, type) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.size = size;
+    this.type = type;
+  }
+
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+
+    if (this.type === "grass") {
+      fill(34, 139, 34);
+    } else if (this.type === "stone") {
+      fill(169, 169, 169);
+    } else if (this.type === "water") {
+      fill(0, 191, 255);
+    }
+
+    box(this.size);
+    pop();
+  }
+}
